@@ -26,7 +26,6 @@ class Ninja{
     recibirDaño(herida){
         this.salud-=herida;
         console.log(`Rayos me ha dolido, mi nueva salud es: ${this.salud}`);
-
     }
 }
 

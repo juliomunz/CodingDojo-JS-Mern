@@ -29,3 +29,14 @@ class Carta {
             this.magnitud=magnitud;
         }
     }
+    
+    effect(target){
+        if (target instanceof Unidad) {
+            console.log(`${this.nombre} ha producido el siguiente efecto en ${target.nombre}: ${this.texto}`);
+            target[this.stat]=target[this.stat]+this.magnitud;
+          } else {
+            throw Error("Sólo puedes afectar a otra carta de Unidad");
+          }
+    }
+}
+

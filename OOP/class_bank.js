@@ -1,3 +1,5 @@
+const test = document.getElementById("main")
+console.log(test)
 // No realizar la prueba en repl.it al hacerlo su respuesta queda disponible para otros postulantes
 // No editar
 const clients = [{
@@ -179,80 +181,197 @@ const banks = [{
 // 7 Objeto en que las claves sean los nombres de los bancos y los valores el id de su cliente con menos dinero.
 // 8 Agregar nuevo cliente con datos ficticios a "clientes" y agregar una cuenta en el BANCO ESTADO con un saldo de 9000 para este nuevo empleado. 
 // Luego devolver el lugar que ocupa este cliente en el ranking de la pregunta 2.
+class Bank {
 
-class Banco {
-    constructor(id, nombre) {
-        this.id = id;
-        this.nombre = nombre;
-        this.clientes = [];
-        this.cuentas = [];
+    constructor(id,name) {
+        this.name=name;
+        this.id=id;
+        this.clientes=[];
     }
-    nuevoCliente(cliente) {
-        this.clientes.push(cliente);
+}
+
+class Client{
+    constructor(id,taxNumber,name){
+        this.id= id;
+        this.taxNumber=taxNumber;
+        this.name=name;
     }
-    listaIdClientes() {
-        let miArreglo = [];
-        for (let i = 0; i < this.clientes.length; i++) {
-            let esteCliente = this.clientes[i];
-            miArreglo.push(esteCliente.id);
-        }
-        console.log(miArreglo);
-        return miArreglo;
+}
+
+class ListClients{
+    constructor(arrClients){
+        this.arrClients = arrClients;
     }
-    listaRutOrdenada() {
-        let miArreglo = [];
-        for (let i = 0; i < this.clientes.length; i++) {
-            let esteCliente = this.clientes[i];
-            miArreglo.push(esteCliente.idImpuestos);
-        }
-        // El método de .sort() es un poquito extraño.
-        // Ordena el arreglo alfabéticamente sin argumento.
-        // Para ordenar las entradas numéricamente hay que pasarle una función.
-        // Lo que hacemos aquí es usar una función flecha.
-        miArreglo.sort((primer, segundo)=> (primer-segundo));
-        // Esto es igual a este ejemplo:
-        // miArreglo.sort(
-        //     function(primer, segundo){
-        //         return primer - segundo;
-        //     }
-        // )
+
+    listClientsIds(){
+       return this.arrClients.map(client => client.id);
+    }
+    listClientsIdsSortByTaxNumber(){
+        return this.arrClients.sort((clientA, clientB) => clientB.taxNumber-clientA.taxNumber).map(client => client.id);
+    }
+}
+
+class Account{
+    constructor(clientId, bankId,balance){
+        this.clientId= clientId;
+        this.bankId= bankId;
+        this.balance= balance;
+    }
+}
+
+class ListAccounts{
+    constructor(arrClients, arrAccounts, arrBanks){
+        this.arrClients = arrClients;
+        this.arrAccounts = arrAccounts;
+        this.arrBanks = arrBanks;
+    }
+
+    getListAccountByClient(){
         
+        return this.arrClients.map(client => this.arrAccounts.filter(account => account.clientId===client.id))
     }
+
+    sortClientsBankBalance(){
+        let result=[];
+        this.arrAccounts.reduce((acumulador, currentValue)=>{
+            if(!acumulador[currentValue.clientId]){
+                acumulador[currentValue.clientId]={
+                    clientId: currentValue.clientId,
+                    balance: 0
+                }
+                result.push(acumulador[currentValue.clientId]);
+            }
+            acumulador[currentValue.clientId].balance +=currentValue.balance;
+            return acumulador
+        },{})
+        let sortedClients = result.sort((itemA,ItemB) => ItemB.balance-itemA.balance).map((item) =>{
+            const clientFinded = this.arrClients.find(({id}) => id === item.clientId);
+            return clientFinded.name;
+
+        } ) 
+    return sortedClients;
+    }
+
+    richClientsBalances(){
+        const listFiltetered = this.arrAccounts.filter((account) => account.bankId===1)
+        let result =[];
+        listFiltetered.reduce((acumulador,currentValue)=>{
+            if(!acumulador[currentValue.clientId]){
+                acumulador[currentValue.clientId]={
+                    clientId: currentValue.clientId,
+                    balance: 0
+                }
+                result.push(acumulador[currentValue.clientId])
+            }
+            acumulador[currentValue.clientId].balance+=currentValue.balance;
+            return acumulador
+        },{})
+        
+        return result.sort((itemA,itemB) => itemB.balance-itemA.balance).map((item)=>item.balance);
+    
+    }
+    banksClientsTaxNumbers(){ 
+
+        const listResult = this.arrAccounts.reduce((acumulador,currentValue)=>{
+            
+           const { name } = this.arrBanks.find(({id})=> id==currentValue.bankId)
+           if(!acumulador[name]){
+               acumulador[name]={
+                   clients:[]
+               }
+           }
+           const { taxNumber } = this.arrClients.find(({id}) => id==currentValue.clientId)
+           if(acumulador[name].clients.indexOf(taxNumber)!==0) {
+            acumulador[name].clients.push(taxNumber)
+           }
+           return acumulador;
+        },{})
+        return listResult;
+    }
+
+    banksRankingByTotalBalance(){
+        let result = [];
+        this.arrAccounts.reduce((acumulador,currentValue) =>{
+            const { bankId, balance } = currentValue;
+            if(!acumulador[bankId]){
+                acumulador[bankId]={
+                    bankId: bankId,
+                    balance: 0
+                }
+                result.push(acumulador[bankId]);
+            }
+            acumulador[bankId].balance += balance;
+            return acumulador;
+        },{})
+        return result.sort((itemA,itemB) => itemA.balance-itemB.balance).map((item)=>item.bankId);
+    }
+
 }
 
-class Cliente {
-    constructor(id, idImpuestos, nombre) {
-        this.id = id;
-        this.idImpuestos = idImpuestos;
-        this.nombre = nombre;
-        this.cuentas = [];
-    }
-}
 
-class Cuenta {
-    constructor(idCliente,idBanco,balance) {
-        this.idCliente = idCliente;
-        this.idBanco = idBanco;
-        this.balance = balance;
-    }
-}
+/**
+ * 
+ * var task_names = tasks.map(function (task, index, array) {
+ 
+    return task.name; 
+ 
+});
+ */
+
+//constantes para crear las instancias de todas las clases
+const createClients = () => clients.map(client => new Client(client.id, client.taxNumber,client.name));
+const createBanks = () => banks.map(bank => new Bank(bank.id, bank.name));
+const createAccounts = () => accounts.map(account => new Account(account.clientId,account.bankId, account.balance));
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//creacion de clases
+
+const accountList = new ListAccounts(clients,accounts,banks);
+const clientList = new ListClients(clients);
+accountList.banksRankingByTotalBalance()
 
 
-// Este código es para crear un banco y poner en ello un par de clientes con cuentas
-const santander = new Banco(123456789, 'Banco Santander');
-const maria = new Cliente(1,10000001,'Maria Vargas');
-const ctaMaria = new Cuenta(1,1,10);
-maria.nuevaCuenta(ctaMaria);
-const pedro = new Cliente(2,6549852,'Pedro Martinez');
-const ctaPedro = new Cuenta(2,1,25);
-pedro.nuevaCuenta(ctaPedro);
-const juan = new Cliente(3,6321258,'Juan Tapia');
-const ctaJuan = new Cuenta(3,1,2);
-juan.nuevaCuenta(ctaJuan);
-const lucas = new Cliente(4,56465820,'Lucas Sandoval');
-const ctaLucas = new Cuenta(4,1,300);
-lucas.nuevaCuenta(ctaLucas);
-const arnolcho = new Cliente(5,3256984,'Arnolcho Perez');
-const ctaArnolcho = new Cuenta(5,1, 659);
-arnolcho.nuevaCuenta(ctaArnolcho);
-santander.clientes = [maria,pedro,juan,lucas,arnolcho];
+
+//accountList.sortClientsBankBalance();
+
+//creacion de constantes que recibiran lo retornado por los metodos de las clases para responder las preguntas del ejercicio
+
+const richClientsBalances = () => accountList.richClientsBalances();
+const sortClientsTotalBalances = () => accountList.sortClientsBankBalance();
+const banksClientsTaxNumbers = () => accountList.banksClientsTaxNumbers();
+const banksRankingByTotalBalance = () => accountList.banksRankingByTotalBalance()
+//console.log(accountList.getListRichersSantander()[0])
+
+const listClientsIds = () => clientList.listClientsIds();
+
+const listClientsIdsSortByTaxNumber = () => clientList.listClientsIdsSortByTaxNumber();
+
+const listAccountByClient = () => clients.map(client => {
+    let accountsByClient=accounts.filter(account => account.clientId==client.id);
+    return accountsByClient;
+})
+
+const cuentasFiltradas = accounts.filter((account) => account.clientId == 6);
+//console.log(listAccountByClient());
+
+
+
+// Impresión de soluciones. No modificar.
+ //console.log('Pregunta 0');
+ //console.log(listClientsIds());
+ //console.log('Pregunta 1');
+ //console.log(listClientsIdsSortByTaxNumber());
+//console.log('Pregunta 2');
+//console.log(sortClientsTotalBalances());
+// console.log('Pregunta 3');
+ //console.log(banksClientsTaxNumbers());
+// console.log('Pregunta 4');
+// console.log(richClientsBalances());
+// console.log('Pregunta 5');
+// console.log(banksRankingByTotalBalance());
+// console.log('Pregunta 6');
+// console.log(banksFidelity());
+// console.log('Pregunta 7');
+// console.log(banksPoorClients());
+// console.log('Pregunta 8');
+// console.log(newClientRanking());

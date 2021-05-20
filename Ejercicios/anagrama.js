@@ -3,7 +3,7 @@
 // output => isAnagram('hola') => false
 
 
-``function esAnagrama(palabra, posibleAnagrama){
+function esAnagrama(palabra, posibleAnagrama){
     if(palabra.toLowerCase() === posibleAnagrama.toLowerCase()) return false;
     
     return palabra.toLowerCase().split("").sort().join("") === posibleAnagrama.toLowerCase().split("").sort().join("");
@@ -30,4 +30,4 @@
       resultado = esAnagrama(palabra, posibleAnagrama);
       
     console.log("¿%s es anagrama de %s? %s", posibleAnagrama, palabra, resultado);
-  }``
+  }
